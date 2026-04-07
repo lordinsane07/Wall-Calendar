@@ -401,6 +401,45 @@
   animation: dot-appear 200ms var(--ease-spring) forwards;
 }
 
+/* ---- HOLIDAY STYLES ---- */
+
+.holidayCell {
+  background: rgba(255, 152, 0, 0.04);
+}
+
+.holidayLabel {
+  font-family: var(--font-body);
+  font-size: 7px;
+  font-weight: 600;
+  line-height: 1.1;
+  text-align: center;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 1px;
+  margin-top: 1px;
+  z-index: 1;
+  letter-spacing: -0.02em;
+}
+
+/* Color coding by holiday type */
+.holidayNational {
+  color: #E65100;
+}
+
+.holidayReligious {
+  color: #6A1B9A;
+}
+
+.holidayRegional {
+  color: #00695C;
+}
+
+.holidayObservance {
+  color: var(--ink-muted);
+}
+
 /* ---- PAGE CURL ---- */
 
 .calendarBody {

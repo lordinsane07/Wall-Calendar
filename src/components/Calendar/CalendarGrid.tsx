@@ -3,9 +3,11 @@
  * Uses Pointer Events API for unified mouse/touch handling.
  */
 
-import { memo, useCallback, useRef, useState } from 'react';
+import { memo, useCallback, useRef, useState, useMemo } from 'react';
 import { useCalendarStore } from '../../store/calendarStore';
-import { getCalendarDays, formatDate, generateNoteId } from '../../lib/dateUtils';
+import { getCalendarDays, formatDate } from '../../lib/dateUtils';
+import { getHolidaysForMonth } from '../../data/holidays';
+import type { Holiday } from '../../data/holidays';
 import DayCell from './DayCell';
 import WeekdayLabels from './WeekdayLabels';
 import styles from '../../styles/calendar.module.css';
@@ -26,10 +28,19 @@ const CalendarGrid = memo(function CalendarGrid() {
   // Build a set of date strings that have notes
   const datesWithNotes = new Set<string>();
   for (const note of notes) {
-    // Mark all dates from rangeStart to rangeEnd
     datesWithNotes.add(note.rangeStart);
     datesWithNotes.add(note.rangeEnd);
   }
+
+  // Build holiday lookup map for current month
+  const holidayMap = useMemo(() => {
+    const holidays = getHolidaysForMonth(viewMonth, viewYear);
+    const map = new Map<string, Holiday>();
+    for (const h of holidays) {
+      map.set(h.date, h);
+    }
+    return map;
+  }, [viewMonth, viewYear]);
 
   // Drag-to-select: pointer down
   const handlePointerDown = useCallback(
@@ -109,12 +120,14 @@ const CalendarGrid = memo(function CalendarGrid() {
         {days.map((day) => {
           const dateKey = formatDate(day.date);
           const hasNote = datesWithNotes.has(dateKey);
+          const holiday = holidayMap.get(dateKey);
 
           return (
             <DayCell
               key={day.date.toISOString()}
               day={day}
               hasNote={hasNote}
+              holiday={holiday}
               onPointerDown={handlePointerDown}
             />
           );

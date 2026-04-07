@@ -1,7 +1,7 @@
 /**
  * DayCell — Individual day cell with all visual states.
  * Handles: start/end circles, in-range pills, hover preview,
- * today diamond dot, note indicators, tap animation.
+ * today diamond dot, note indicators, holiday labels, tap animation.
  */
 
 import { memo, useState, useCallback } from 'react';
@@ -9,11 +9,13 @@ import { isSameDay } from 'date-fns';
 import { useCalendarStore } from '../../store/calendarStore';
 import { isInRange, isRangeStart, isRangeEnd } from '../../lib/dateUtils';
 import type { CalendarDay } from '../../lib/calendarTypes';
+import type { Holiday } from '../../data/holidays';
 import styles from '../../styles/calendar.module.css';
 
 interface DayCellProps {
   day: CalendarDay;
   hasNote: boolean;
+  holiday?: Holiday;
   onPointerDown?: (date: Date, e: React.PointerEvent) => void;
   onPointerEnter?: (date: Date) => void;
 }
@@ -21,6 +23,7 @@ interface DayCellProps {
 const DayCell = memo(function DayCell({
   day,
   hasNote,
+  holiday,
   onPointerDown,
   onPointerEnter,
 }: DayCellProps) {
@@ -59,6 +62,18 @@ const DayCell = memo(function DayCell({
   if (isSingleDay) classes.push(styles.singleDay);
   if (isHoverPreview) classes.push(styles.hoverPreview);
   if (tapped) classes.push(styles.tapped);
+  if (holiday && isCurrentMonth) classes.push(styles.holidayCell);
+
+  // Holiday type class for color coding
+  const holidayTypeClass = holiday
+    ? holiday.type === 'national'
+      ? styles.holidayNational
+      : holiday.type === 'religious'
+        ? styles.holidayReligious
+        : holiday.type === 'regional'
+          ? styles.holidayRegional
+          : styles.holidayObservance
+    : '';
 
   const handleClick = useCallback(() => {
     if (!isCurrentMonth) return;
@@ -107,12 +122,21 @@ const DayCell = memo(function DayCell({
       onKeyDown={handleKeyDown}
       role="gridcell"
       tabIndex={isCurrentMonth ? 0 : -1}
-      aria-label={`${dayOfMonth}${isToday ? ', today' : ''}${inRange ? ', selected' : ''}`}
+      aria-label={`${dayOfMonth}${isToday ? ', today' : ''}${holiday ? `, ${holiday.name}` : ''}${inRange ? ', selected' : ''}`}
       aria-selected={inRange || isStart || isEnd}
       data-date={date.toISOString()}
+      title={holiday && isCurrentMonth ? holiday.name : undefined}
     >
       <span className={styles.dayNumber}>{dayOfMonth}</span>
-      {isToday && isCurrentMonth && (
+
+      {/* Holiday label — truncated name below the number */}
+      {holiday && isCurrentMonth && (
+        <span className={`${styles.holidayLabel} ${holidayTypeClass}`}>
+          {holiday.name}
+        </span>
+      )}
+
+      {isToday && isCurrentMonth && !holiday && (
         <div className={styles.todayDot} aria-hidden="true" />
       )}
       {hasNote && isCurrentMonth && (
