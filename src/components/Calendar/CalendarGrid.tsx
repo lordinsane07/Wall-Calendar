@@ -1,0 +1,127 @@
+/**
+ * CalendarGrid — 7×N day grid with drag-to-select support.
+ * Uses Pointer Events API for unified mouse/touch handling.
+ */
+
+import { memo, useCallback, useRef, useState } from 'react';
+import { useCalendarStore } from '../../store/calendarStore';
+import { getCalendarDays, formatDate, generateNoteId } from '../../lib/dateUtils';
+import DayCell from './DayCell';
+import WeekdayLabels from './WeekdayLabels';
+import styles from '../../styles/calendar.module.css';
+
+const CalendarGrid = memo(function CalendarGrid() {
+  const viewMonth = useCalendarStore((s) => s.viewMonth);
+  const viewYear = useCalendarStore((s) => s.viewYear);
+  const weekStart = useCalendarStore((s) => s.weekStart);
+  const notes = useCalendarStore((s) => s.notes);
+  const handleDayClick = useCalendarStore((s) => s.handleDayClick);
+  const handleDayHover = useCalendarStore((s) => s.handleDayHover);
+
+  const days = getCalendarDays(viewYear, viewMonth, weekStart);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const dragStartDate = useRef<Date | null>(null);
+
+  // Build a set of date strings that have notes
+  const datesWithNotes = new Set<string>();
+  for (const note of notes) {
+    // Mark all dates from rangeStart to rangeEnd
+    datesWithNotes.add(note.rangeStart);
+    datesWithNotes.add(note.rangeEnd);
+  }
+
+  // Drag-to-select: pointer down
+  const handlePointerDown = useCallback(
+    (date: Date, e: React.PointerEvent) => {
+      if (!gridRef.current) return;
+      setIsDragging(true);
+      dragStartDate.current = date;
+
+      // Capture pointer for drag across cells
+      gridRef.current.setPointerCapture(e.pointerId);
+      handleDayClick(date);
+    },
+    [handleDayClick]
+  );
+
+  // Drag-to-select: pointer move
+  const handlePointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging || !gridRef.current) return;
+
+      // Find which cell is under the pointer
+      const element = document.elementFromPoint(e.clientX, e.clientY);
+      if (!element) return;
+
+      const cellEl = element.closest('[data-date]');
+      if (!cellEl) return;
+
+      const dateStr = cellEl.getAttribute('data-date');
+      if (!dateStr) return;
+
+      const date = new Date(dateStr);
+      handleDayHover(date);
+    },
+    [isDragging, handleDayHover]
+  );
+
+  // Drag-to-select: pointer up
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (!isDragging || !gridRef.current) return;
+
+      setIsDragging(false);
+      gridRef.current.releasePointerCapture(e.pointerId);
+
+      // Find the cell under pointer and finalize
+      const element = document.elementFromPoint(e.clientX, e.clientY);
+      if (!element) return;
+
+      const cellEl = element.closest('[data-date]');
+      if (!cellEl) return;
+
+      const dateStr = cellEl.getAttribute('data-date');
+      if (!dateStr) return;
+
+      const endDate = new Date(dateStr);
+      if (dragStartDate.current && endDate.getTime() !== dragStartDate.current.getTime()) {
+        handleDayClick(endDate);
+      }
+
+      dragStartDate.current = null;
+    },
+    [isDragging, handleDayClick]
+  );
+
+  return (
+    <div className={styles.calendarBody}>
+      <WeekdayLabels />
+      <div
+        ref={gridRef}
+        className={styles.calendarGrid}
+        role="grid"
+        aria-label="Calendar dates"
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        style={{ touchAction: 'none' }}
+      >
+        {days.map((day) => {
+          const dateKey = formatDate(day.date);
+          const hasNote = datesWithNotes.has(dateKey);
+
+          return (
+            <DayCell
+              key={day.date.toISOString()}
+              day={day}
+              hasNote={hasNote}
+              onPointerDown={handlePointerDown}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+});
+
+export default CalendarGrid;

@@ -1,0 +1,373 @@
+/* ============================================================
+   notes.module.css — Notes panel, editor, and bottom sheet styles
+   ============================================================ */
+
+/* ---- NOTES SIDEBAR (Desktop) ---- */
+
+.notesPanel {
+  width: var(--notes-width);
+  background: var(--notes-cream);
+  border-radius: 4px;
+  padding: var(--space-lg);
+  position: relative;
+  transform: rotate(0.4deg);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.06),
+    0 8px 16px rgba(0,0,0,0.08);
+
+  /* Ruled lines like a notepad */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 27px,
+    var(--notes-line) 27px,
+    var(--notes-line) 28px
+  );
+  background-size: 100% 28px;
+  background-position: 0 60px;
+}
+
+/* Red margin line */
+.notesPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 36px;
+  width: 1px;
+  height: 100%;
+  background: rgba(220, 80, 80, 0.15);
+}
+
+.notesPanelTitle {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: var(--space-sm);
+  letter-spacing: -0.01em;
+}
+
+.rangeLabel {
+  font-family: var(--font-handwriting);
+  font-size: 16px;
+  color: var(--accent);
+  margin-bottom: var(--space-md);
+  position: relative;
+}
+
+/* ---- NOTE EDITOR ---- */
+
+.noteEditor {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.noteTitleInput {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--ink-faint);
+  padding: var(--space-xs) 0;
+  outline: none;
+  width: 100%;
+  transition: border-color var(--duration-fast) var(--ease-out);
+}
+
+.noteTitleInput:focus {
+  border-bottom-color: var(--accent);
+}
+
+.noteTitleInput::placeholder {
+  color: var(--ink-faint);
+  font-weight: 400;
+}
+
+.noteTextarea {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: transparent;
+  border: none;
+  resize: vertical;
+  min-height: 120px;
+  padding: var(--space-xs) 0;
+  outline: none;
+  line-height: 28px;
+  width: 100%;
+}
+
+.noteTextarea::placeholder {
+  color: var(--ink-faint);
+}
+
+/* ---- NOTE ACTIONS ---- */
+
+.noteActions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.saveButton {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+
+.saveButton:hover {
+  background: var(--accent-dark);
+}
+
+.saveButton:active {
+  transform: scale(0.97);
+}
+
+.saveButton.stamped {
+  animation: note-save-stamp 250ms ease;
+  background: var(--success);
+}
+
+.clearButton {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: none;
+  color: var(--ink-muted);
+  border: 1px solid var(--ink-faint);
+  border-radius: 4px;
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+
+.clearButton:hover {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+.deleteButton {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background: none;
+  color: var(--ink-muted);
+  border: 1px solid var(--ink-faint);
+  border-radius: 4px;
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+
+.deleteButton:hover {
+  color: var(--error);
+  border-color: var(--error);
+}
+
+/* ---- EMPTY STATE ---- */
+
+.emptyState {
+  text-align: center;
+  padding: var(--space-xl) var(--space-md);
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
+.emptyStateIcon {
+  font-size: 32px;
+  margin-bottom: var(--space-sm);
+  opacity: 0.4;
+}
+
+/* ---- NOTES LIST ---- */
+
+.notesList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.noteItem {
+  background: rgba(255,255,255,0.5);
+  border-radius: 4px;
+  padding: var(--space-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) var(--ease-out);
+  border: 1px solid transparent;
+}
+
+.noteItem:hover {
+  background: rgba(255,255,255,0.8);
+  border-color: var(--accent-light);
+}
+
+.noteItemTitle {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 2px;
+}
+
+.noteItemRange {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-muted);
+}
+
+/* ---- FAB (Tablet) ---- */
+
+.fab {
+  position: fixed;
+  bottom: var(--space-lg);
+  right: var(--space-lg);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  border: none;
+  box-shadow:
+    0 4px 8px rgba(0,0,0,0.15),
+    0 8px 24px rgba(0,0,0,0.12);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  z-index: 100;
+  transition: transform var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.fab:hover {
+  transform: scale(1.05);
+  box-shadow:
+    0 6px 12px rgba(0,0,0,0.18),
+    0 12px 32px rgba(0,0,0,0.15);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
+
+/* ---- BOTTOM SHEET (Mobile) ---- */
+
+.bottomSheetOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 200;
+  opacity: 0;
+  transition: opacity 200ms ease;
+  pointer-events: none;
+}
+
+.bottomSheetOverlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.bottomSheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--notes-cream);
+  border-radius: 16px 16px 0 0;
+  padding: var(--space-lg);
+  padding-top: var(--space-md);
+  z-index: 201;
+  transform: translateY(100%);
+  transition: transform 300ms var(--ease-page);
+  max-height: 70vh;
+  overflow-y: auto;
+
+  /* Ruled lines */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 27px,
+    var(--notes-line) 27px,
+    var(--notes-line) 28px
+  );
+  background-size: 100% 28px;
+  background-position: 0 52px;
+}
+
+.bottomSheet.open {
+  transform: translateY(0);
+}
+
+.bottomSheetHandle {
+  width: 40px;
+  height: 4px;
+  background: var(--ink-faint);
+  border-radius: 2px;
+  margin: 0 auto var(--space-md);
+}
+
+/* ---- HANDWRITING ANNOTATION ---- */
+
+.rangeAnnotation {
+  position: relative;
+  display: inline-block;
+}
+
+.rangeAnnotation svg {
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  overflow: visible;
+}
+
+.annotationPath {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  fill: none;
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: handwriting-draw 500ms ease forwards;
+}
+
+/* ---- RESPONSIVE ---- */
+
+@media (max-width: 1023px) {
+  .notesPanel {
+    display: none;
+  }
+
+  .fab {
+    display: flex;
+  }
+}
+
+@media (max-width: 767px) {
+  .fab {
+    bottom: var(--space-md);
+    right: var(--space-md);
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+}
