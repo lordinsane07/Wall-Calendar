@@ -92,6 +92,11 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  overflow: hidden;
+}
+
 html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
@@ -103,8 +108,6 @@ body {
   font-family: var(--font-body);
   color: var(--ink);
   line-height: 1.5;
-  min-height: 100vh;
-  overflow-x: hidden;
 
   /* Wall plaster texture — warm eggshell with subtle grain */
   background-color: var(--wall-bg);
@@ -123,15 +126,17 @@ body {
       transparent 1px,
       transparent 8px
     );
+  background-attachment: fixed;
 }
 
 #root {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  padding: var(--space-xl) var(--space-md);
-  padding-top: 60px;
+  align-items: center;
+  padding: var(--space-sm);
+  overflow: hidden;
 }
 
 /* ============================================================

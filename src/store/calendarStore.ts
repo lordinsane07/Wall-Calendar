@@ -160,7 +160,6 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
           const existing = notes.find((n) => n.id === noteId);
           set({
             activeNote: existing ?? null,
-            notesPanelOpen: true,
           });
         } else {
           // Click outside range → start new selection

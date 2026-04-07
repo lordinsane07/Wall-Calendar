@@ -5,15 +5,17 @@
 /* ---- NOTES SIDEBAR (Desktop) ---- */
 
 .notesPanel {
-  width: var(--notes-width);
+  width: 280px;
+  min-width: 280px;
   background: var(--notes-cream);
-  border-radius: 4px;
-  padding: var(--space-lg);
+  border-radius: 6px;
+  padding: var(--space-lg) var(--space-lg) var(--space-xl);
   position: relative;
   transform: rotate(0.4deg);
   box-shadow:
     0 2px 4px rgba(0,0,0,0.06),
     0 8px 16px rgba(0,0,0,0.08);
+  min-height: 360px;
 
   /* Ruled lines like a notepad */
   background-image: repeating-linear-gradient(
@@ -24,7 +26,7 @@
     var(--notes-line) 28px
   );
   background-size: 100% 28px;
-  background-position: 0 60px;
+  background-position: 0 80px;
 }
 
 /* Red margin line */
@@ -40,19 +42,24 @@
 
 .notesPanelTitle {
   font-family: var(--font-display);
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--ink);
-  margin-bottom: var(--space-sm);
+  margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
   letter-spacing: -0.01em;
+  border-bottom: 2px solid rgba(180, 140, 100, 0.2);
 }
 
 .rangeLabel {
   font-family: var(--font-handwriting);
-  font-size: 16px;
+  font-size: 18px;
   color: var(--accent);
+  margin-top: var(--space-sm);
   margin-bottom: var(--space-md);
+  padding-bottom: var(--space-sm);
   position: relative;
+  border-bottom: 1px dashed rgba(180, 160, 140, 0.25);
 }
 
 /* ---- NOTE EDITOR ---- */
@@ -60,7 +67,8 @@
 .noteEditor {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
 }
 
 .noteTitleInput {
@@ -68,17 +76,19 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--ink);
-  background: transparent;
-  border: none;
-  border-bottom: 1px dashed var(--ink-faint);
-  padding: var(--space-xs) 0;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(180, 160, 140, 0.2);
+  border-radius: 4px;
+  padding: var(--space-sm) var(--space-sm);
   outline: none;
   width: 100%;
-  transition: border-color var(--duration-fast) var(--ease-out);
+  transition: border-color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
 }
 
 .noteTitleInput:focus {
-  border-bottom-color: var(--accent);
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.6);
 }
 
 .noteTitleInput::placeholder {
@@ -90,14 +100,22 @@
   font-family: var(--font-body);
   font-size: 13px;
   color: var(--ink);
-  background: transparent;
-  border: none;
+  background: rgba(255,255,255,0.4);
+  border: 1px solid rgba(180, 160, 140, 0.2);
+  border-radius: 4px;
   resize: vertical;
-  min-height: 120px;
-  padding: var(--space-xs) 0;
+  min-height: 140px;
+  padding: var(--space-sm);
   outline: none;
   line-height: 28px;
   width: 100%;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out);
+}
+
+.noteTextarea:focus {
+  border-color: var(--accent);
+  background: rgba(255,255,255,0.6);
 }
 
 .noteTextarea::placeholder {
