@@ -263,6 +263,20 @@ body {
   overflow: hidden;
 }
 
+@media (max-width: 767px) {
+  html, body {
+    overflow: auto;
+    overflow: overlay;
+  }
+
+  #root {
+    overflow-y: auto;
+    overflow-x: hidden;
+    align-items: flex-start;
+    padding: var(--space-xs) var(--space-xs) 80px;
+  }
+}
+
 /* ============================================================
    TYPOGRAPHY  
    ============================================================ */
