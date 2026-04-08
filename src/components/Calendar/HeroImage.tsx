@@ -106,7 +106,11 @@ const HeroImage = memo(function HeroImage({
         loading="lazy"
         width="520"
         height="220"
-        style={{ opacity: loaded ? 1 : 0, transition: 'opacity 350ms ease-in-out' }}
+        style={{ 
+          opacity: loaded ? 1 : 0, 
+          transition: 'opacity 350ms ease-in-out',
+          transform: 'translate(calc(var(--mouse-x, 0) * -15px), calc(var(--mouse-y, 0) * -10px)) scale(1.05)'
+        }}
       />
 
       {/* Glossy photo paper overlay */}

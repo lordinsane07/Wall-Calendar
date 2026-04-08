@@ -70,3 +70,21 @@ export interface HeroImageEntry {
   alt: string;
   credit: string;
 }
+
+/** A single calendar event attached to a specific day */
+export interface CalendarEvent {
+  id: string;
+  date: string; // YYYY-MM-DD
+  title: string;
+  color: EventColor;
+  createdAt: number;
+}
+
+/** Event color tags */
+export type EventColor = 'blue' | 'red' | 'green' | 'orange' | 'purple';
+
+/** View mode — month grid or year overview */
+export type ViewMode = 'month' | 'year';
+
+/** Theme mode */
+export type ThemeMode = 'light' | 'dark' | 'auto';

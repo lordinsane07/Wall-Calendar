@@ -1,5 +1,5 @@
 /**
- * Zustand store — centralized state for navigation, selection, and notes.
+ * Zustand store — centralized state for navigation, selection, notes, events, theme, and view mode.
  * Handles localStorage persistence for all user data.
  */
 
@@ -9,7 +9,11 @@ import type {
   SelectionState,
   DateRange,
   Note,
+  CalendarEvent,
+  EventColor,
   WeekStart,
+  ViewMode,
+  ThemeMode,
   PersistedSelection,
 } from '../lib/calendarTypes';
 import { generateNoteId, isInRange, safeParse, formatDate } from '../lib/dateUtils';
@@ -38,9 +42,19 @@ interface CalendarStore {
   // Navigation
   viewMonth: number;
   viewYear: number;
+  hoveredNoteId: string | null;
+
+  // Actions
   goToPrevMonth: () => void;
   goToNextMonth: () => void;
   goToMonth: (month: number, year: number) => void;
+  goToToday: () => void;
+  setHoveredNoteId: (id: string | null) => void;
+
+  // View mode
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
+  toggleViewMode: () => void;
 
   // Selection state machine
   selectionState: SelectionState;
@@ -50,7 +64,7 @@ interface CalendarStore {
   handleDayHover: (date: Date | null) => void;
   clearSelection: () => void;
 
-  // Notes
+  // Notes (range-based)
   notes: Note[];
   activeNote: Note | null;
   saveNote: (title: string, content: string) => void;
@@ -58,9 +72,21 @@ interface CalendarStore {
   loadNoteForRange: (start: Date, end: Date) => void;
   clearActiveNote: () => void;
 
+  // Events (day-specific)
+  events: CalendarEvent[];
+  addEvent: (date: string, title: string, color: EventColor) => void;
+  deleteEvent: (id: string) => void;
+  getEventsForDate: (date: string) => CalendarEvent[];
+  getEventsForMonth: (month: number, year: number) => CalendarEvent[];
+
   // Settings
   weekStart: WeekStart;
   setWeekStart: (ws: WeekStart) => void;
+
+  // Theme
+  theme: ThemeMode;
+  setTheme: (theme: ThemeMode) => void;
+  cycleTheme: () => void;
 
   // Notes panel visibility (mobile)
   notesPanelOpen: boolean;
@@ -108,7 +134,18 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
       return { viewMonth: m, viewYear: y };
     }),
 
-  goToMonth: (month, year) => set({ viewMonth: month, viewYear: year }),
+  goToMonth: (month, year) => set({ viewMonth: month, viewYear: year, viewMode: 'month' }),
+
+  goToToday: () => set({
+    viewMonth: now.getMonth(),
+    viewYear: now.getFullYear(),
+    viewMode: 'month',
+  }),
+
+  // View mode
+  viewMode: 'month',
+  setViewMode: (mode) => set({ viewMode: mode }),
+  toggleViewMode: () => set((s) => ({ viewMode: s.viewMode === 'month' ? 'year' : 'month' })),
 
   // Selection state machine
   selectionState: restored.state,
@@ -120,7 +157,6 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
 
     switch (selectionState) {
       case 'idle': {
-        // Start new selection
         const newRange = { start: date, end: null };
         set({ selectionState: 'selecting', range: newRange, hoverDate: null });
         persistSelection(newRange);
@@ -129,11 +165,9 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
 
       case 'selecting': {
         if (range.start && isSameDay(date, range.start)) {
-          // Click same date → cancel
           set({ selectionState: 'idle', range: { start: null, end: null }, hoverDate: null });
           persistSelection({ start: null, end: null });
         } else {
-          // Complete selection (always sort min→max)
           const start = range.start!;
           const newRange = {
             start: isBefore(date, start) ? date : start,
@@ -142,7 +176,6 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
           set({ selectionState: 'selected', range: newRange, hoverDate: null });
           persistSelection(newRange);
 
-          // Auto-load existing note for this range
           const noteId = generateNoteId(newRange.start!, newRange.end!);
           const existing = notes.find((n) => n.id === noteId);
           if (existing) {
@@ -155,14 +188,10 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
       case 'selected': {
         const { start, end } = range;
         if (start && end && isInRange(date, start, end)) {
-          // Click inside range → open note editor
           const noteId = generateNoteId(start, end);
           const existing = notes.find((n) => n.id === noteId);
-          set({
-            activeNote: existing ?? null,
-          });
+          set({ activeNote: existing ?? null });
         } else {
-          // Click outside range → start new selection
           const newRange = { start: date, end: null };
           set({
             selectionState: 'selecting',
@@ -192,6 +221,9 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
   // Notes
   notes: loadFromStorage<Note[]>('cal_notes', []),
   activeNote: null,
+  hoveredNoteId: null,
+  
+  setHoveredNoteId: (id) => set({ hoveredNoteId: id }),
 
   saveNote: (title: string, content: string) => {
     const { range, notes } = get();
@@ -204,14 +236,12 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
     let updatedNotes: Note[];
 
     if (existingIndex >= 0) {
-      // Update existing
       updatedNotes = notes.map((n, i) =>
         i === existingIndex
           ? { ...n, title, content, updatedAt: timestamp }
           : n
       );
     } else {
-      // Create new
       const newNote: Note = {
         id,
         rangeStart: formatDate(range.start),
@@ -244,12 +274,60 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
 
   clearActiveNote: () => set({ activeNote: null }),
 
+  // Events (day-specific)
+  events: loadFromStorage<CalendarEvent[]>('cal_events', []),
+
+  addEvent: (date: string, title: string, color: EventColor) => {
+    const { events } = get();
+    const newEvent: CalendarEvent = {
+      id: `evt_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      date,
+      title,
+      color,
+      createdAt: Date.now(),
+    };
+    const updated = [...events, newEvent];
+    set({ events: updated });
+    saveToStorage('cal_events', updated);
+  },
+
+  deleteEvent: (id: string) => {
+    const { events } = get();
+    const updated = events.filter((e) => e.id !== id);
+    set({ events: updated });
+    saveToStorage('cal_events', updated);
+  },
+
+  getEventsForDate: (date: string) => {
+    return get().events.filter((e) => e.date === date);
+  },
+
+  getEventsForMonth: (month: number, year: number) => {
+    const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+    return get().events.filter((e) => e.date.startsWith(prefix));
+  },
+
   // Settings
   weekStart: loadFromStorage<WeekStart>('cal_week_start', 'mon'),
 
   setWeekStart: (ws: WeekStart) => {
     set({ weekStart: ws });
     saveToStorage('cal_week_start', ws);
+  },
+
+  // Theme
+  theme: loadFromStorage<ThemeMode>('cal_theme', 'light'),
+
+  setTheme: (theme: ThemeMode) => {
+    set({ theme });
+    saveToStorage('cal_theme', theme);
+  },
+
+  cycleTheme: () => {
+    const { theme } = get();
+    const next: ThemeMode = theme === 'light' ? 'dark' : theme === 'dark' ? 'auto' : 'light';
+    set({ theme: next });
+    saveToStorage('cal_theme', next);
   },
 
   // Notes panel

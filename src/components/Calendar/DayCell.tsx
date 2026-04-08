@@ -16,6 +16,8 @@ interface DayCellProps {
   day: CalendarDay;
   hasNote: boolean;
   holiday?: Holiday;
+  eventCount?: number;
+  isHoveredNote?: boolean;
   onPointerDown?: (date: Date, e: React.PointerEvent) => void;
   onPointerEnter?: (date: Date) => void;
 }
@@ -24,6 +26,8 @@ const DayCell = memo(function DayCell({
   day,
   hasNote,
   holiday,
+  eventCount = 0,
+  isHoveredNote = false,
   onPointerDown,
   onPointerEnter,
 }: DayCellProps) {
@@ -63,6 +67,11 @@ const DayCell = memo(function DayCell({
   if (isHoverPreview) classes.push(styles.hoverPreview);
   if (tapped) classes.push(styles.tapped);
   if (holiday && isCurrentMonth) classes.push(styles.holidayCell);
+
+  // Note cross-highlight
+  if (isHoveredNote && isCurrentMonth) {
+    classes.push(styles.hoveredNotePulse);
+  }
 
   // Holiday type class for color coding
   const holidayTypeClass = holiday
@@ -141,6 +150,13 @@ const DayCell = memo(function DayCell({
       )}
       {hasNote && isCurrentMonth && (
         <div className={styles.noteDot} aria-label="Has note" />
+      )}
+      {eventCount > 0 && isCurrentMonth && (
+        <div className={styles.eventDots} aria-label={`${eventCount} event${eventCount > 1 ? 's' : ''}`}>
+          {Array.from({ length: Math.min(eventCount, 3) }, (_, i) => (
+            <span key={i} className={styles.eventDot} />
+          ))}
+        </div>
       )}
     </div>
   );

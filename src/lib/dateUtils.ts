@@ -121,11 +121,16 @@ export function formatRangeLabel(start: Date | null, end: Date | null): string {
   const realStart = isBefore(start, end) ? start : end;
   const realEnd = isAfter(start, end) ? start : end;
 
+  const currentYear = new Date().getFullYear();
+  
   if (realStart.getFullYear() === realEnd.getFullYear()) {
+    const showYear = realStart.getFullYear() !== currentYear;
+    const yearSuffix = showYear ? ', yyyy' : '';
+    
     if (realStart.getMonth() === realEnd.getMonth()) {
-      return `${format(realStart, 'MMM d')} – ${format(realEnd, 'd')}`;
+      return `${format(realStart, `MMM d${yearSuffix}`)} – ${format(realEnd, 'd')}`;
     }
-    return `${format(realStart, 'MMM d')} – ${format(realEnd, 'MMM d')}`;
+    return `${format(realStart, `MMM d${yearSuffix}`)} – ${format(realEnd, `MMM d`)}`;
   }
   return `${format(realStart, 'MMM d, yyyy')} – ${format(realEnd, 'MMM d, yyyy')}`;
 }

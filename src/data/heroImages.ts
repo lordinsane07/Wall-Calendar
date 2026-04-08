@@ -1,71 +1,84 @@
 /**
  * Curated hero images keyed by month index (0-11).
- * Using picsum.photos for guaranteed reliability — no API key needed.
- * Each month has a fixed seed so the image is consistent.
+ * Using Unsplash Source with specific photo IDs for guaranteed
+ * season-appropriate imagery. Each photo is hand-picked to match
+ * the month's theme/season in the Indian context.
  */
 
 import type { HeroImageEntry } from '../lib/calendarTypes';
 
 const heroImages: Record<number, HeroImageEntry> = {
   0: {
-    url: 'https://picsum.photos/seed/january-winter/800/400',
-    alt: 'Snow-covered winter landscape',
-    credit: 'Picsum',
+    // January — crisp winter morning, frost on grass
+    url: 'https://images.unsplash.com/photo-1491002052546-bf38f186af56?w=800&h=400&fit=crop&crop=center',
+    alt: 'Crisp winter morning with frost on fields',
+    credit: 'Unsplash',
   },
   1: {
-    url: 'https://picsum.photos/seed/february-love/800/400',
-    alt: 'Warm cozy February scene',
-    credit: 'Picsum',
+    // February — spring blossoms starting, cherry/almond flowers
+    url: 'https://images.unsplash.com/photo-1457269449834-928af64c684d?w=800&h=400&fit=crop&crop=center',
+    alt: 'Pink spring blossoms on a tree branch',
+    credit: 'Unsplash',
   },
   2: {
-    url: 'https://picsum.photos/seed/march-spring/800/400',
-    alt: 'Early spring flowers blooming',
-    credit: 'Picsum',
+    // March — Holi, vibrant spring colors
+    url: 'https://images.unsplash.com/photo-1455659817273-f96807779a8a?w=800&h=400&fit=crop&crop=center',
+    alt: 'Colorful spring flowers in full bloom',
+    credit: 'Unsplash',
   },
   3: {
-    url: 'https://picsum.photos/seed/april-rain/800/400',
-    alt: 'April spring showers and blooms',
-    credit: 'Picsum',
+    // April — warm sun, green fields, harvest season
+    url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&h=400&fit=crop&crop=center',
+    alt: 'Golden sunlight over green agricultural fields',
+    credit: 'Unsplash',
   },
   4: {
-    url: 'https://picsum.photos/seed/may-green/800/400',
-    alt: 'Lush green hills and meadows',
-    credit: 'Picsum',
+    // May — hot Indian summer, blue sky, arid landscape
+    url: 'https://images.unsplash.com/photo-1507400492013-162706c8c05e?w=800&h=400&fit=crop&crop=center',
+    alt: 'Hot summer landscape under vast blue sky',
+    credit: 'Unsplash',
   },
   5: {
-    url: 'https://picsum.photos/seed/june-summer/800/400',
-    alt: 'Golden sunset at the beach',
-    credit: 'Picsum',
+    // June — monsoon approaching, dramatic clouds
+    url: 'https://images.unsplash.com/photo-1534274988757-a28bf1a57c17?w=800&h=400&fit=crop&crop=center',
+    alt: 'Dramatic monsoon clouds over tropical landscape',
+    credit: 'Unsplash',
   },
   6: {
-    url: 'https://picsum.photos/seed/july-sunshine/800/400',
-    alt: 'Bright summer landscape',
-    credit: 'Picsum',
+    // July — monsoon rains, lush green, rain-soaked
+    url: 'https://images.unsplash.com/photo-1501691223387-dd0500403074?w=800&h=400&fit=crop&crop=center',
+    alt: 'Lush green rain-soaked tropical foliage',
+    credit: 'Unsplash',
   },
   7: {
-    url: 'https://picsum.photos/seed/august-lake/800/400',
-    alt: 'Late summer lakeside view',
-    credit: 'Picsum',
+    // August — Independence Day month, monsoon greenery, waterfalls
+    url: 'https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800&h=400&fit=crop&crop=center',
+    alt: 'Verdant green mountains with monsoon clouds',
+    credit: 'Unsplash',
   },
   8: {
-    url: 'https://picsum.photos/seed/september-fall/800/400',
-    alt: 'Autumn foliage in warm amber',
-    credit: 'Picsum',
+    // September — late monsoon, golden light, harvest approaching
+    url: 'https://images.unsplash.com/photo-1473448912268-2022ce9509d8?w=800&h=400&fit=crop&crop=center',
+    alt: 'Golden autumn light filtering through trees',
+    credit: 'Unsplash',
   },
   9: {
-    url: 'https://picsum.photos/seed/october-mist/800/400',
-    alt: 'Misty October forest',
-    credit: 'Picsum',
+    // October — festive season (Dussehra, Diwali prep), warm autumn tones
+    url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=400&fit=crop&crop=center',
+    alt: 'Warm amber autumn landscape with golden light',
+    credit: 'Unsplash',
   },
   10: {
-    url: 'https://picsum.photos/seed/november-frost/800/400',
-    alt: 'Late autumn bare trees with frost',
-    credit: 'Picsum',
+    // November — Diwali, festive lights, warm harvest tones
+    url: 'https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=800&h=400&fit=crop&crop=center',
+    alt: 'Beautiful twilight sunset over calm waters',
+    credit: 'Unsplash',
   },
   11: {
-    url: 'https://picsum.photos/seed/december-snow/800/400',
-    alt: 'December winter wonderland',
-    credit: 'Picsum',
+    // December — cool winter, pine/cedar scenery, Christmas
+    url: 'https://images.unsplash.com/photo-1418985991508-e47386d96a71?w=800&h=400&fit=crop&crop=center',
+    alt: 'Serene winter forest with mist and cool tones',
+    credit: 'Unsplash',
   },
 };
 

@@ -17,6 +17,7 @@ const CalendarGrid = memo(function CalendarGrid() {
   const viewYear = useCalendarStore((s) => s.viewYear);
   const weekStart = useCalendarStore((s) => s.weekStart);
   const notes = useCalendarStore((s) => s.notes);
+  const events = useCalendarStore((s) => s.events);
   const handleDayClick = useCalendarStore((s) => s.handleDayClick);
   const handleDayHover = useCalendarStore((s) => s.handleDayHover);
 
@@ -24,6 +25,9 @@ const CalendarGrid = memo(function CalendarGrid() {
   const gridRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const dragStartDate = useRef<Date | null>(null);
+
+  const hoveredNoteId = useCalendarStore((s) => s.hoveredNoteId);
+  const hoveredNote = useMemo(() => notes.find(n => n.id === hoveredNoteId), [notes, hoveredNoteId]);
 
   // Build a set of date strings that have notes
   const datesWithNotes = new Set<string>();
@@ -41,6 +45,15 @@ const CalendarGrid = memo(function CalendarGrid() {
     }
     return map;
   }, [viewMonth, viewYear]);
+
+  // Build event count map for current month
+  const eventCountMap = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const evt of events) {
+      map.set(evt.date, (map.get(evt.date) ?? 0) + 1);
+    }
+    return map;
+  }, [events]);
 
   // Drag-to-select: pointer down
   const handlePointerDown = useCallback(
@@ -121,13 +134,23 @@ const CalendarGrid = memo(function CalendarGrid() {
           const dateKey = formatDate(day.date);
           const hasNote = datesWithNotes.has(dateKey);
           const holiday = holidayMap.get(dateKey);
+          const eventCount = eventCountMap.get(dateKey) ?? 0;
+          
+          let isHoveredNote = false;
+          if (hoveredNote) {
+            const hStart = new Date(hoveredNote.rangeStart + 'T00:00:00');
+            const hEnd = new Date(hoveredNote.rangeEnd + 'T23:59:59');
+            isHoveredNote = day.date >= hStart && day.date <= hEnd;
+          }
 
           return (
             <DayCell
               key={day.date.toISOString()}
               day={day}
               hasNote={hasNote}
+              isHoveredNote={isHoveredNote}
               holiday={holiday}
+              eventCount={eventCount}
               onPointerDown={handlePointerDown}
             />
           );
