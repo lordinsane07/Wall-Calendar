@@ -197,6 +197,22 @@ const Calendar = function Calendar() {
 
                 {/* Grid */}
                 <CalendarGrid />
+
+                {/* Legend */}
+                <div className={styles.legend}>
+                  <span className={styles.legendItem}>
+                    <span className={styles.legendTriangle} />
+                    Multi-day Note
+                  </span>
+                  <span className={styles.legendItem}>
+                    <span className={styles.legendCircle} />
+                    Single-day Note / Event
+                  </span>
+                  <span className={styles.legendItem}>
+                    <span className={styles.legendDiamond} />
+                    <span style={{ fontSize: '0.9em', opacity: 0.9 }}>Task created today</span>
+                  </span>
+                </div>
               </>
             ) : (
               <>

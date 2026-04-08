@@ -14,7 +14,8 @@ import styles from '../../styles/calendar.module.css';
 
 interface DayCellProps {
   day: CalendarDay;
-  hasNote: boolean;
+  hasMultiNote: boolean;
+  hasSingleNote: boolean;
   holiday?: Holiday;
   eventCount?: number;
   isHoveredNote?: boolean;
@@ -24,7 +25,8 @@ interface DayCellProps {
 
 const DayCell = memo(function DayCell({
   day,
-  hasNote,
+  hasMultiNote,
+  hasSingleNote,
   holiday,
   eventCount = 0,
   isHoveredNote = false,
@@ -144,18 +146,18 @@ const DayCell = memo(function DayCell({
           {holiday.name}
         </span>
       )}
-
-      {isToday && isCurrentMonth && !holiday && (
-        <div className={styles.todayDot} aria-hidden="true" />
-      )}
-      {hasNote && isCurrentMonth && (
-        <div className={styles.noteDot} aria-label="Has note" />
-      )}
-      {eventCount > 0 && isCurrentMonth && (
-        <div className={styles.eventDots} aria-label={`${eventCount} event${eventCount > 1 ? 's' : ''}`}>
-          {Array.from({ length: Math.min(eventCount, 3) }, (_, i) => (
-            <span key={i} className={styles.eventDot} />
-          ))}
+      {/* Indicator row — sits below holiday label or day number */}
+      {isCurrentMonth && (isToday || hasMultiNote || hasSingleNote || eventCount > 0) && (
+        <div className={styles.indicatorRow}>
+          {isToday && !holiday && (
+            <span className={styles.todayDot} aria-hidden="true" />
+          )}
+          {hasMultiNote && (
+            <span className={styles.noteDot} aria-label="Multi-day note" />
+          )}
+          {(hasSingleNote || eventCount > 0) && (
+            <span className={styles.eventDot} aria-label="Single-day note" />
+          )}
         </div>
       )}
     </div>

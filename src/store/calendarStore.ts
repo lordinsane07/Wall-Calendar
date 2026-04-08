@@ -164,23 +164,25 @@ export const useCalendarStore = create<CalendarStore>((set, get) => ({
       }
 
       case 'selecting': {
+        let newRange: DateRange;
         if (range.start && isSameDay(date, range.start)) {
-          set({ selectionState: 'idle', range: { start: null, end: null }, hoverDate: null });
-          persistSelection({ start: null, end: null });
+          // Same day clicked twice = single-day selection
+          newRange = { start: date, end: date };
         } else {
           const start = range.start!;
-          const newRange = {
+          newRange = {
             start: isBefore(date, start) ? date : start,
             end: isAfter(date, start) ? date : start,
           };
-          set({ selectionState: 'selected', range: newRange, hoverDate: null });
-          persistSelection(newRange);
+        }
+        
+        set({ selectionState: 'selected', range: newRange, hoverDate: null });
+        persistSelection(newRange);
 
-          const noteId = generateNoteId(newRange.start!, newRange.end!);
-          const existing = notes.find((n) => n.id === noteId);
-          if (existing) {
-            set({ activeNote: existing });
-          }
+        const noteId = generateNoteId(newRange.start!, newRange.end!);
+        const existing = notes.find((n) => n.id === noteId);
+        if (existing) {
+          set({ activeNote: existing });
         }
         break;
       }

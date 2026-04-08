@@ -30,11 +30,29 @@ const CalendarGrid = memo(function CalendarGrid() {
   const hoveredNote = useMemo(() => notes.find(n => n.id === hoveredNoteId), [notes, hoveredNoteId]);
 
   // Build a set of date strings that have notes
-  const datesWithNotes = new Set<string>();
-  for (const note of notes) {
-    datesWithNotes.add(note.rangeStart);
-    datesWithNotes.add(note.rangeEnd);
-  }
+  const datesWithMultiDayNotes = useMemo(() => {
+    const set = new Set<string>();
+    for (const note of notes) {
+      if (note.rangeStart !== note.rangeEnd) {
+        const start = new Date(note.rangeStart + 'T00:00:00');
+        const end = new Date(note.rangeEnd + 'T00:00:00');
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+          set.add(formatDate(d));
+        }
+      }
+    }
+    return set;
+  }, [notes]);
+
+  const datesWithSingleDayNotes = useMemo(() => {
+    const set = new Set<string>();
+    for (const note of notes) {
+      if (note.rangeStart === note.rangeEnd) {
+        set.add(note.rangeStart);
+      }
+    }
+    return set;
+  }, [notes]);
 
   // Build holiday lookup map for current month
   const holidayMap = useMemo(() => {
@@ -132,7 +150,8 @@ const CalendarGrid = memo(function CalendarGrid() {
       >
         {days.map((day) => {
           const dateKey = formatDate(day.date);
-          const hasNote = datesWithNotes.has(dateKey);
+          const hasMultiNote = datesWithMultiDayNotes.has(dateKey);
+          const hasSingleNote = datesWithSingleDayNotes.has(dateKey);
           const holiday = holidayMap.get(dateKey);
           const eventCount = eventCountMap.get(dateKey) ?? 0;
           
@@ -147,7 +166,8 @@ const CalendarGrid = memo(function CalendarGrid() {
             <DayCell
               key={day.date.toISOString()}
               day={day}
-              hasNote={hasNote}
+              hasMultiNote={hasMultiNote}
+              hasSingleNote={hasSingleNote}
               isHoveredNote={isHoveredNote}
               holiday={holiday}
               eventCount={eventCount}
