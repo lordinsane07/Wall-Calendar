@@ -154,7 +154,6 @@ export function getCalendarDays(
   weekStart: WeekStart = 'mon'
 ): CalendarDay[] {
   const days: CalendarDay[] = [];
-  const today = new Date();
   const offset = getFirstDayOffset(year, month, weekStart);
   const daysInMonth = getDaysInMonth(year, month);
 
