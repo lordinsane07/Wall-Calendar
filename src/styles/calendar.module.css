@@ -190,6 +190,8 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   padding: var(--space-md) var(--space-lg) var(--space-sm);
   background: var(--paper-base);
   user-select: none;
@@ -268,6 +270,7 @@
   display: flex;
   gap: 6px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 /* ---- WEEKDAY LABELS ---- */
@@ -776,7 +779,22 @@
   }
 
   .calendarHeader {
-    padding: var(--space-sm) var(--space-md) var(--space-xs);
+    padding: var(--space-md) var(--space-md) var(--space-sm);
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .headerLeft {
+    align-items: center;
+    width: 100%;
+  }
+
+  .headerRight {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    row-gap: 8px;
   }
 }
 
